@@ -6,5 +6,9 @@ project(HippoMocks)
 add_subdirectory(HippoMocks)
 add_subdirectory(HippoMocksTest)
 
-install(FILES ${PROJECT_SOURCE_DIR}/HippoMocks/hippomocks.h
-        DESTINATION include/)
+install(FILES
+            ${PROJECT_SOURCE_DIR}/HippoMocks/hippomocks.h
+            ${PROJECT_SOURCE_DIR}/HippoMocks/qtestsupport.h
+        DESTINATION
+            include/
+        )
