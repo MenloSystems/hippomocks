@@ -93,7 +93,11 @@ inline std::ostream &operator<<(std::ostream &os, const MockRepository &repo)
 #ifndef BASE_EXCEPTION
 #define BASE_EXCEPTION std::exception
 #endif
+#if __cpp_lib_uncaught_exceptions >= 201411L
+#define RAISEEXCEPTION(e)			{ DEBUGBREAK(e); if (std::uncaught_exceptions()) latentException = [=, &repo]{ throw e; }; else throw e; }
+#else
 #define RAISEEXCEPTION(e)			{ DEBUGBREAK(e); if (std::uncaught_exception()) latentException = [=, &repo]{ throw e; }; else throw e; }
+#endif
 
 class BaseException
 	: public BASE_EXCEPTION
@@ -251,7 +255,12 @@ inline Reporter* GetDefaultReporter() {
       latentException = []{};
     }
     void TestFinished() override {
+#if __cpp_lib_uncaught_exceptions >= 201411L
+      if (!std::uncaught_exceptions() && latentException) {
+#else
+
       if (!std::uncaught_exception() && latentException) {
+#endif
         latentException();
       }
     }

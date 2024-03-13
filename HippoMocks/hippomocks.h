@@ -905,7 +905,11 @@ public:
 #endif
   {
 #ifndef HM_NO_EXCEPTIONS
+#if __cpp_lib_uncaught_exceptions >= 201411L
+    if (!std::uncaught_exceptions())
+#else
     if (!std::uncaught_exception())
+#endif
     {
       try
       {
