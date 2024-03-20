@@ -32,7 +32,7 @@
 # endif
 
 # ifdef SOME_X86
-#  if defined(_MSC_VER) && (defined(_WIN32) || defined(_WIN64))
+#  if (defined(_MSC_VER) || defined(__GNUC__)) && (defined(_WIN32) || defined(_WIN64))
 #   define _HIPPOMOCKS__ENABLE_CFUNC_MOCKING_SUPPORT
 #  elif defined(__linux__) && defined(__GNUC__)
 #   define _HIPPOMOCKS__ENABLE_CFUNC_MOCKING_SUPPORT

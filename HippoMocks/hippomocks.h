@@ -46,7 +46,7 @@
 #define HM_NS HippoMocks::
 #endif
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #ifdef _WIN64
 #define WINCALL
 #else
