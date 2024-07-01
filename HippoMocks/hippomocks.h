@@ -786,6 +786,11 @@ public:
   template <int X, typename Y, typename... Args>
   TCall<Y, Args...> &RegisterExpect_(Y (*func)(Args...), RegistrationType expect, const char *functionName, const char *fileName, unsigned long lineNo);
 
+#if __GXX_ABI_VERSION >= 100 && defined(SOME_X86)
+  template <int X, typename Z2, typename Y, typename... Args>
+  TCall<Y, Z2*, Args...> &RegisterExpect_(Y (Z2::*func)(Args...), RegistrationType expect, const char *functionName, const char *fileName, unsigned long lineNo);
+#endif
+
 #if defined(_MSC_VER) && !defined(_WIN64)
   template <int X, typename Y, typename... Args>
   TCall<Y, Args...> &RegisterExpect_(Y (__stdcall *func)(Args...), RegistrationType expect, const char *functionName, const char *fileName, unsigned long lineNo);
@@ -1157,6 +1162,29 @@ TCall<Y,Args...> &MockRepository::RegisterExpect_(Y (*func)(Args...), Registrati
   addCall( call, expect );
   return *call;
 }
+
+#if __GXX_ABI_VERSION >= 100 && defined(SOME_X86)
+template <int X, typename Z2, typename Y, typename... Args>
+TCall<Y, Z2*, Args...> &MockRepository::RegisterExpect_(Y (Z2::*func)(Args...), RegistrationType expect, const char *functionName, const char *fileName, unsigned long lineNo)
+{
+  // In the  Itanium C++ ABI, the `this` pointer is simply passed as the first argument (cf. 3.1.2.1 this Parameters).
+  // In cases where this is possible, we just cast the member function pointer accordingly. If not, we fail.
+  // Note that this does not work with virtual methods. For these, *ptr is an offset into the vtable. We could
+  // try to statically detect this by introducing an arbitrary upper limit of valid *ptr values, but I don't know
+  // what a sensible value would be.
+
+  // 2.3.2 Member Function Pointers
+  struct memfnptr_t {
+    char *ptr;
+    ptrdiff_t adj;
+  };
+  static_assert(sizeof(memfnptr_t) == sizeof(func));
+
+  auto memfnptr = horrible_cast<memfnptr_t>(func);
+
+  return RegisterExpect_<X>(reinterpret_cast<Y(*)(Z2*, Args...)>(memfnptr.ptr + memfnptr.adj), expect, functionName, fileName, lineNo);
+}
+#endif
 
 #if defined(_MSC_VER) && !defined(_WIN64)
 template <int X, typename Y, typename... Args>
