@@ -6,7 +6,7 @@
 
 namespace HippoMocks {
 
-HippoMocks::Reporter *qTestReporter() {
+inline HippoMocks::Reporter *qTestReporter() {
     static struct QTestReporter : HippoMocks::Reporter {
         QTestReporter() : latentException([]{}) {}
         std::function<void()> latentException;
