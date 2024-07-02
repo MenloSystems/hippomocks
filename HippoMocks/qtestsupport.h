@@ -6,6 +6,34 @@
 
 namespace HippoMocks {
 
+template<class T>
+inline void printQtType(std::ostream &os, T &&arg)
+{
+    QString out;
+    QDebug dbg(&out);
+    dbg << arg;
+
+    os << out.toUtf8().constData();
+}
+
+template<>
+struct printArg<QByteArray>
+{
+    static inline void print(std::ostream &os, const QByteArray &arg)
+    {
+        printQtType(os, arg);
+    }
+};
+
+template<>
+struct printArg<QString>
+{
+    static inline void print(std::ostream &os, const QString &arg)
+    {
+        printQtType(os, arg);
+    }
+};
+
 inline HippoMocks::Reporter *qTestReporter() {
     static struct QTestReporter : HippoMocks::Reporter {
         QTestReporter() : latentException([]{}) {}

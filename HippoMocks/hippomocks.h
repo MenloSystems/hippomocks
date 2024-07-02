@@ -190,10 +190,8 @@ inline std::ostream &operator<<(std::ostream &os, std::reference_wrapper<T> &ref
 template <typename T>
 struct printArg
 {
-  static inline void print(std::ostream &os, T arg, bool withComma)
+  static inline void print(std::ostream &os, const T &arg)
   {
-    if (withComma)
-      os << ",";
     os << arg;
   }
 };
@@ -232,11 +230,12 @@ struct argumentPrinter {
 #pragma warning(push)
 #pragma warning(disable: 4127)
 #endif
-	if (index != 0) os << ",";
+    if (index != 0) os << ",";
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-	os << std::get<index>(t);
+    using T = std::remove_cv_t<std::remove_reference_t<std::tuple_element_t<index, Tuple>>>;
+    printArg<T>::print(os, std::get<index>(t));
     argumentPrinter<index+1, limit, Tuple>::Print(os, t);
   }
 };
