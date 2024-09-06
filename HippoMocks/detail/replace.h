@@ -43,7 +43,7 @@
 #  define _HIPPOMOCKS__ENABLE_CFUNC_MOCKING_SUPPORT
 
 // This clear-cache is *required*. The tests will fail if you remove it.
-extern "C" void __clear_cache(char *beg, char *end);
+extern "C" void __clear_cache(void *beg, void *end);
 # endif
 
 # ifdef _HIPPOMOCKS__ENABLE_CFUNC_MOCKING_SUPPORT
